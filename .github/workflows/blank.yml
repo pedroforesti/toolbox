@@ -74,7 +74,7 @@ jobs:
             -X POST \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $GITHUB_ID_TOKEN" \
-            --data "{\"execution_id\":\"$EXECUTION_ID\",\"external_id\":\"$GITHUB_RUN_ID\",\"outputs\": {\"spc_tag\":\"$SPC_TAG\",\"artifact_tag\":\"$ARTIFACT_TAG\",\"when_tag\":\"$when_tag\",\"toolbox_tag\":\"$toolbox_tag\"}}"
+            --data "{\"execution_id\":\"$EXECUTION_ID\",\"external_id\":\"$GITHUB_RUN_ID\",\"outputs\": {\"spc_tag\":\"$SPC_TAG\",\"artifact_tag\":\"$ARTIFACT_TAG\",\"when_tag\":\"$WHEN_TAG\",\"toolbox_tag\":\"$TOOLBOX_TAG\"}}"
 
             
         env:
