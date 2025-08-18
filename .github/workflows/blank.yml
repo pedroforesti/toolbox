@@ -1,0 +1,86 @@
+name: Task
+
+#
+# The workflow file must accept `workflow_dispatch` events,
+# and define the `superplane_execution_id` input injected by SuperPlane.
+#
+on:
+  workflow_dispatch:
+    inputs:
+      superplane_execution_id:
+        description: 'Superplane Execution ID'
+        required: true
+        type: string
+      spc_tag:
+        description: 'spc_tag'
+        required: false
+        type: string
+        default: "test"
+      artifact_tag:
+        description: 'artifact_tag'
+        required: false
+        type: string
+        default: "test"
+      toolbox_tag:
+        description: 'toolbox_tag'
+        required: false
+        type: string
+        default: "test"
+      when_tag:
+        description: 'when_tag'
+        required: false
+        type: string
+        default: "test"
+
+#
+# Required for generating the OIDC ID token to push outputs to SuperPlane.
+#
+permissions:
+  id-token: write
+
+#
+# The `superplane_execution_id` input must be used to dynamically set the workflow run name.
+# Required for SuperPlane to identify the workflow run.
+# See: https://github.com/orgs/community/discussions/9752
+#
+run-name: "Task - ${{ inputs.superplane_execution_id }}"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+      #
+      # These steps are required for generating an OIDC ID token to use
+      # to push outputs from the workflow run to SuperPlane.
+      #
+      - name: Install OIDC Client from Core Package
+        run: npm install @actions/core@1.6.0 @actions/http-client
+      - name: Get Id Token
+        uses: actions/github-script@v7
+        id: idToken
+        with:
+          script: |
+            let token = await core.getIDToken('superplane')
+            core.setOutput('token', token)
+
+      #
+      # This step just pushes an output to SuperPlane using the ID token generated above
+      # and the workflow run ID.
+      #
+      - run: |
+          curl -s \
+            https://superplane.sxmoon.com/api/v1/outputs \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $GITHUB_ID_TOKEN" \
+            --data "{\"execution_id\":\"$EXECUTION_ID\",\"external_id\":\"$GITHUB_RUN_ID\",\"outputs\": {\"spc_tag\":\"$SPC_TAG\",\"artifact_tag\":\"$ARTIFACT_TAG\",\"when_tag\":\"$when_tag\",\"toolbox_tag\":\"$toolbox_tag\"}}"
+
+            
+        env:
+          EXECUTION_ID: ${{ inputs.superplane_execution_id }}
+          GITHUB_ID_TOKEN: ${{ steps.idToken.outputs.token }}
+          SPC_TAG: ${{ inputs.spc_tag }}
+          ARTIFACT_TAG: ${{ inputs.artifact_tag }}
+          WHEN_TAG: ${{ inputs.when_tag }}
+          TOOLBOX_TAG: ${{ inputs.toolbox_tag }}
