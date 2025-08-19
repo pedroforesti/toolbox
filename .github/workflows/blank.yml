@@ -69,6 +69,7 @@ jobs:
       # and the workflow run ID.
       #
       - run: |
+          sleep $((150 + $RANDOM % 40))
           curl -s \
             https://superplane.sxmoon.com/api/v1/outputs \
             -X POST \
