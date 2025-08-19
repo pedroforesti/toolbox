@@ -11,6 +11,6 @@ blocks:
         - name: 'Job #1'
           commands:
             - checkout
-            - sleep $((150 + $RANDOM % 40))
+            - sleep $((10 + $RANDOM % 40))
             - 'export SUPERPLANE_URL=https://superplane.sxmoon.com'
             - 'curl "$SUPERPLANE_URL/api/v1/outputs" -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $SEMAPHORE_OIDC_TOKEN" --data "{\"execution_id\": \"$SUPERPLANE_STAGE_EXECUTION_ID\",\"external_id\": \"$SEMAPHORE_WORKFLOW_ID\",\"outputs\": {\"spc_tag\":\"$spc_tag\",\"artifact_tag\":\"$artifact_tag\",\"when_tag\":\"$when_tag\",\"toolbox_tag\":\"$toolbox_tag\"}}"'
